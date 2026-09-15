@@ -12,12 +12,17 @@ export class UsersController {
     private getUserByIdUseCase: GetUserByIdUseCase,
     private updateUserUseCase: UpdateUserUseCase,
     private deleteUserUseCase: DeleteUserUseCase,
-  ) {}
+  ) { }
 
   async create(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+      
       const user = await this.createUserUseCase.execute(req.body);
-      res.status(201).json(user);
+      res.status(201).json({
+        statusCode: 201,
+        message: 'User created successfully',
+        data: user,
+      });
     } catch (error) {
       next(error);
     }
@@ -26,7 +31,11 @@ export class UsersController {
   async findAll(_req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const users = await this.getUsersUseCase.execute();
-      res.json(users);
+      res.status(200).json({
+        statusCode: 200,
+        message: 'Users retrieved successfully',
+        data: users,
+      });
     } catch (error) {
       next(error);
     }
@@ -36,7 +45,11 @@ export class UsersController {
     try {
       const id = Number(req.params.id);
       const user = await this.getUserByIdUseCase.execute(id);
-      res.json(user);
+      res.status(200).json({
+        statusCode: 200,
+        message: 'User retrieved successfully',
+        data: user,
+      });
     } catch (error) {
       next(error);
     }
@@ -46,7 +59,11 @@ export class UsersController {
     try {
       const id = Number(req.params.id);
       const updatedUser = await this.updateUserUseCase.execute(id, req.body);
-      res.json(updatedUser);
+      res.status(200).json({
+        statusCode: 200,
+        message: 'User updated successfully',
+        data: updatedUser,
+      });
     } catch (error) {
       next(error);
     }
@@ -56,7 +73,10 @@ export class UsersController {
     try {
       const id = Number(req.params.id);
       await this.deleteUserUseCase.execute(id);
-      res.status(204).send();
+      res.status(200).json({
+        statusCode: 200,
+        message: 'User deleted successfully',
+      });
     } catch (error) {
       next(error);
     }

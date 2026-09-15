@@ -1,5 +1,5 @@
 import { IUserRepository } from '../../../domain/repositories/user.repository';
-import { UserResponseDTO } from '../../dtos/user.dto';
+import { UserResponseDTO, sanitizeUser } from '../../dtos/user.dto';
 import { NotFoundError } from '../../../domain/errors/domain.error';
 
 export class GetUserByIdUseCase {
@@ -10,6 +10,6 @@ export class GetUserByIdUseCase {
     if (!user) {
       throw new NotFoundError('User', id);
     }
-    return user;
+    return sanitizeUser(user);
   }
 }

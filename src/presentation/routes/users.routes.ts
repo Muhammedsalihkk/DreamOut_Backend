@@ -7,6 +7,7 @@ import { GetUserByIdUseCase } from '../../application/use-cases/users/get-user-b
 import { UpdateUserUseCase } from '../../application/use-cases/users/update-user.use-case';
 import { DeleteUserUseCase } from '../../application/use-cases/users/delete-user.use-case';
 import { UsersController } from '../controllers/users.controller';
+import { validateCreateUser, validateUpdateUser } from '../validators/user.validator';
 
 const userRepository = new PrismaUserRepository(prisma);
 const createUserUseCase = new CreateUserUseCase(userRepository);
@@ -21,14 +22,14 @@ const usersController = new UsersController(
   getUserByIdUseCase,
   updateUserUseCase,
   deleteUserUseCase,
-);
+); 
 
 const router = Router();
 
-router.post('/', (req, res, next) => usersController.create(req, res, next));
+router.post('/', validateCreateUser, (req, res, next) => usersController.create(req, res, next));
 router.get('/', (req, res, next) => usersController.findAll(req, res, next));
 router.get('/:id', (req, res, next) => usersController.findOne(req, res, next));
-router.patch('/:id', (req, res, next) => usersController.update(req, res, next));
+router.patch('/:id', validateUpdateUser, (req, res, next) => usersController.update(req, res, next));
 router.delete('/:id', (req, res, next) => usersController.remove(req, res, next));
 
 export default router;

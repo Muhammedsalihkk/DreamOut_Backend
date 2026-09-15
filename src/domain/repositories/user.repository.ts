@@ -3,6 +3,7 @@ import { User } from '../entities/user.entity';
 export interface CreateUserData {
   email: string;
   name?: string;
+  password?: string;
 }
 
 export interface UpdateUserData {
