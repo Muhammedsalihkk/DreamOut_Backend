@@ -11,14 +11,18 @@ export class PrismaUserRepository implements IUserRepository {
 
   async create(data: CreateUserData): Promise<User> {
     return this.prisma.user.create({
-      data,
+      data: {
+        email: data.email,
+        name: data.name,
+        password: data.password || '',
+      },
     });
   }
 
   async findAll(): Promise<User[]> {
     return this.prisma.user.findMany();
   }
-
+ 
   async findById(id: number): Promise<User | null> {
     return this.prisma.user.findUnique({
       where: { id },
