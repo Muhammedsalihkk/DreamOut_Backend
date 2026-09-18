@@ -30,3 +30,12 @@ export class ConflictError extends DomainError {
     super(message);
   }
 }
+
+export class UnauthorizedError extends DomainError {
+  readonly statusCode = 401;
+
+  constructor(message: string = 'Unauthorized') {
+    super(message);
+  }
+}
+
