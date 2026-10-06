@@ -18,7 +18,8 @@ model User {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  spots Spot[]
+  spots  Spot[]
+  routes Route[]
 
   @@map("users")
 }
@@ -28,8 +29,10 @@ model Spot {
   userId      Int      @map("user_id")
   name        String   @db.VarChar(150)
   description String?  @db.Text
-  latitude    Decimal  @db.Decimal(10, 8)
-  longitude   Decimal  @db.Decimal(11, 8)
+  image       String?  @db.Text
+  location    String?  @db.VarChar(150)
+  latitude    Decimal  @default(10.0889) @db.Decimal(10, 8)
+  longitude   Decimal  @default(77.0595) @db.Decimal(11, 8)
   category    String   @db.VarChar(50)
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
@@ -39,4 +42,27 @@ model Spot {
   @@map("spots")
 }
 
+model Route {
+  id               Int      @id @default(autoincrement())
+  userId           Int      @map("user_id")
+  title            String   @db.VarChar(150)
+  coverImage       String?  @map("cover_image") @db.Text
+  shortDescription String?  @map("short_description") @db.Text
+  description      String?  @db.Text
+  location         String?  @db.VarChar(150)
+  category         String   @db.VarChar(50)
+  difficulty       String   @default("Moderate") @db.VarChar(50)
+  visibility       String   @default("Public") @db.VarChar(50)
+  distance         String?  @db.VarChar(50)
+  duration         String?  @db.VarChar(50)
+  places           Json?    @db.JsonB
+  highlights       Json?    @db.JsonB
+  likesCount       Int      @default(0) @map("likes_count")
+  commentsCount    Int      @default(0) @map("comments_count")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("routes")
+}

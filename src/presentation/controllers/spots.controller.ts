@@ -4,6 +4,7 @@ import { GetSpotsUseCase } from '../../application/use-cases/spots/get-spots.use
 import { GetSpotUseCase } from '../../application/use-cases/spots/get-spot.use-case';
 import { UpdateSpotUseCase } from '../../application/use-cases/spots/update-spot.use-case';
 import { DeleteSpotUseCase } from '../../application/use-cases/spots/delete-spot.use-case';
+import { JwtService } from '../../infrastructure/security/jwt.service';
 
 export class SpotsController {
   constructor(
@@ -16,7 +17,29 @@ export class SpotsController {
 
   async create(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const userId = (req as any).user?.id ? Number((req as any).user.id) : (req.body.userId ? Number(req.body.userId) : 1);
+      let userId: number | undefined;
+
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.split(' ')[1];
+        try {
+          const decoded = JwtService.verifyToken<{ userId: number }>(token);
+          if (decoded && decoded.userId) {
+            userId = Number(decoded.userId);
+          }
+        } catch {
+          // Token invalid or expired, continue without token
+        }
+      }
+
+      if (!userId && (req as any).user?.id) {
+        userId = Number((req as any).user.id);
+      }
+
+      if (!userId && req.body.userId) {
+        userId = Number(req.body.userId);
+      }
+
       const spot = await this.createSpotUseCase.execute(req.body, userId);
       res.status(201).json({
         statusCode: 201,

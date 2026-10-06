@@ -4,14 +4,18 @@ export interface CreateSpotData {
   userId: number;
   name: string;
   description?: string | null;
-  latitude: number;
-  longitude: number;
+  image?: string | null;
+  location?: string | null;
+  latitude?: number;
+  longitude?: number;
   category: string;
 }
 
 export interface UpdateSpotData {
   name?: string;
   description?: string | null;
+  image?: string | null;
+  location?: string | null;
   latitude?: number;
   longitude?: number;
   category?: string;
