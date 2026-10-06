@@ -3,6 +3,8 @@ export interface Spot {
   userId: number;
   name: string;
   description: string | null;
+  image: string | null;
+  location: string | null;
   latitude: number;
   longitude: number;
   category: string;

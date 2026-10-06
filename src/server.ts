@@ -5,9 +5,10 @@ import { connectDatabase, disconnectDatabase } from './infrastructure/database/p
 async function startServer() {
   await connectDatabase();
 
-  const server = app.listen(config.port, () => {
-    console.log(`Application is running on port ${config.port}`);
+  const server = app.listen(config.port, '0.0.0.0', () => {
+    console.log(`Application is running on http://0.0.0.0:${config.port} (Port ${config.port})`);
   });
+
 
   const handleShutdown = async (signal: string) => {
     console.log(`Received ${signal}. Gracefully shutting down...`);

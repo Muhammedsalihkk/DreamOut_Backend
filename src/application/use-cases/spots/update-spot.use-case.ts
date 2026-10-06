@@ -44,6 +44,8 @@ export class UpdateSpotUseCase {
     return this.spotRepository.update(id, {
       ...(dto.name !== undefined && { name: dto.name.trim() }),
       ...(dto.description !== undefined && { description: dto.description ? dto.description.trim() : null }),
+      ...(dto.image !== undefined && { image: dto.image ? dto.image.trim() : null }),
+      ...(dto.location !== undefined && { location: dto.location ? dto.location.trim() : null }),
       ...(dto.latitude !== undefined && { latitude: Number(dto.latitude) }),
       ...(dto.longitude !== undefined && { longitude: Number(dto.longitude) }),
       ...(dto.category !== undefined && { category: dto.category.trim() }),
