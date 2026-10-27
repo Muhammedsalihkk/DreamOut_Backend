@@ -5,6 +5,7 @@ import spotsRouter from './spots.routes';
 import routesRouter from './routes.routes';
 import authRouter from './auth.routes';
 import mediaRouter from './media.routes';
+import journeysRouter from './journeys.routes';
 
 const apiRouter = Router();
 apiRouter.get('/', (_req: Request, res: Response) => {
@@ -16,5 +17,6 @@ apiRouter.use('/users', usersRouter);
 apiRouter.use('/spots', spotsRouter);
 apiRouter.use('/routes', routesRouter);
 apiRouter.use('/media', mediaRouter);
+apiRouter.use('/journeys', journeysRouter);
 
 export default apiRouter;
