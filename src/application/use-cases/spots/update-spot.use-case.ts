@@ -1,6 +1,7 @@
 import { ISpotRepository } from '../../../domain/repositories/spot.repository';
 import { UpdateSpotDTO, SpotResponseDTO } from '../../dtos/spot.dto';
 import { NotFoundError, BadRequestError } from '../../../domain/errors/domain.error';
+import { BackendCloudinaryService } from '../../../infrastructure/security/cloudinary.service';
 
 export class UpdateSpotUseCase {
   constructor(private spotRepository: ISpotRepository) {}
@@ -39,6 +40,17 @@ export class UpdateSpotUseCase {
 
     if (dto.longitude !== undefined && isNaN(Number(dto.longitude))) {
       throw new BadRequestError('Longitude must be a valid number');
+    }
+
+    if (
+      dto.image !== undefined &&
+      dto.image !== existingSpot.image &&
+      existingSpot.image &&
+      BackendCloudinaryService.isCloudinaryUrl(existingSpot.image)
+    ) {
+      BackendCloudinaryService.deleteAsset(existingSpot.image).catch((err) => {
+        console.warn(`[UpdateSpotUseCase] Could not cleanup replaced Cloudinary asset: ${err?.message}`);
+      });
     }
 
     return this.spotRepository.update(id, {

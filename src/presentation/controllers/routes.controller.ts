@@ -4,6 +4,7 @@ import { GetRoutesUseCase } from '../../application/use-cases/routes/get-routes.
 import { GetRouteUseCase } from '../../application/use-cases/routes/get-route.use-case';
 import { UpdateRouteUseCase } from '../../application/use-cases/routes/update-route.use-case';
 import { DeleteRouteUseCase } from '../../application/use-cases/routes/delete-route.use-case';
+import { JwtService } from '../../infrastructure/security/jwt.service';
 
 export class RoutesController {
   constructor(
@@ -16,7 +17,33 @@ export class RoutesController {
 
   async create(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const userId = (req as any).user?.id ? Number((req as any).user.id) : (req.body.userId ? Number(req.body.userId) : 6);
+      let userId: number | undefined;
+
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.split(' ')[1];
+        try {
+          const decoded = JwtService.verifyToken<{ userId: number }>(token);
+          if (decoded && decoded.userId) {
+            userId = Number(decoded.userId);
+          }
+        } catch {
+          // Token invalid or expired
+        }
+      }
+
+      if (!userId && (req as any).user?.id) {
+        userId = Number((req as any).user.id);
+      }
+
+      if (!userId && req.body.userId) {
+        userId = Number(req.body.userId);
+      }
+
+      if (!userId) {
+        userId = 6;
+      }
+
       const route = await this.createRouteUseCase.execute(req.body, userId);
       res.status(201).json({
         statusCode: 201,
