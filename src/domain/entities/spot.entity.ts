@@ -10,4 +10,9 @@ export interface Spot {
   category: string;
   createdAt: Date;
   updatedAt: Date;
+  user?: {
+    id: number;
+    name: string | null;
+    email?: string;
+  };
 }

@@ -22,6 +22,11 @@ export class PrismaSpotRepository implements ISpotRepository {
     category: string;
     createdAt: Date;
     updatedAt: Date;
+    user?: {
+      id: number;
+      name: string | null;
+      email?: string;
+    } | null;
   }): Spot {
     return {
       id: spot.id,
@@ -35,6 +40,13 @@ export class PrismaSpotRepository implements ISpotRepository {
       category: spot.category,
       createdAt: spot.createdAt,
       updatedAt: spot.updatedAt,
+      user: spot.user
+        ? {
+            id: spot.user.id,
+            name: spot.user.name,
+            email: spot.user.email,
+          }
+        : undefined,
     };
   }
 
@@ -88,12 +100,22 @@ export class PrismaSpotRepository implements ISpotRepository {
         longitude: data.longitude !== undefined ? data.longitude : 77.0595,
         category: data.category,
       },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true },
+        },
+      },
     });
     return this.mapToEntity(created);
   }
 
   async findAll(): Promise<Spot[]> {
     const spots = await this.prisma.spot.findMany({
+      include: {
+        user: {
+          select: { id: true, name: true, email: true },
+        },
+      },
       orderBy: { createdAt: 'desc' },
     });
     return spots.map((spot) => this.mapToEntity(spot));
@@ -102,6 +124,11 @@ export class PrismaSpotRepository implements ISpotRepository {
   async findById(id: number): Promise<Spot | null> {
     const spot = await this.prisma.spot.findUnique({
       where: { id },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true },
+        },
+      },
     });
     return spot ? this.mapToEntity(spot) : null;
   }
