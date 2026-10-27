@@ -18,8 +18,9 @@ model User {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  spots  Spot[]
-  routes Route[]
+  spots    Spot[]
+  routes   Route[]
+  journeys Journey[]
 
   @@map("users")
 }
@@ -43,26 +44,64 @@ model Spot {
 }
 
 model Route {
-  id               Int      @id @default(autoincrement())
-  userId           Int      @map("user_id")
-  title            String   @db.VarChar(150)
-  coverImage       String?  @map("cover_image") @db.Text
-  shortDescription String?  @map("short_description") @db.Text
-  description      String?  @db.Text
-  location         String?  @db.VarChar(150)
-  category         String   @db.VarChar(50)
-  difficulty       String   @default("Moderate") @db.VarChar(50)
-  visibility       String   @default("Public") @db.VarChar(50)
-  distance         String?  @db.VarChar(50)
-  duration         String?  @db.VarChar(50)
-  places           Json?    @db.JsonB
-  highlights       Json?    @db.JsonB
-  likesCount       Int      @default(0) @map("likes_count")
-  commentsCount    Int      @default(0) @map("comments_count")
-  createdAt        DateTime @default(now()) @map("created_at")
-  updatedAt        DateTime @updatedAt @map("updated_at")
+  id               Int       @id @default(autoincrement())
+  userId           Int       @map("user_id")
+  title            String    @db.VarChar(150)
+  coverImage       String?   @map("cover_image") @db.Text
+  shortDescription String?   @map("short_description") @db.Text
+  description      String?   @db.Text
+  location         String?   @db.VarChar(150)
+  category         String    @db.VarChar(50)
+  difficulty       String    @default("Moderate") @db.VarChar(50)
+  visibility       String    @default("Public") @db.VarChar(50)
+  distance         String?   @db.VarChar(50)
+  duration         String?   @db.VarChar(50)
+  places           Json?     @db.JsonB
+  highlights       Json?     @db.JsonB
+  likesCount       Int       @default(0) @map("likes_count")
+  commentsCount    Int       @default(0) @map("comments_count")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  journeys Journey[]
 
   @@map("routes")
+}
+
+model Journey {
+  id               Int             @id @default(autoincrement())
+  userId           Int             @map("user_id")
+  routeId          Int             @map("route_id")
+  status           String          @default("IN_PROGRESS") @db.VarChar(50)
+  currentSpotIndex Int             @default(0) @map("current_spot_index")
+  exploredSpots    Json?           @default("[]") @map("explored_spots") @db.JsonB
+  totalDuration    String?         @map("total_duration") @db.VarChar(50)
+  startedAt        DateTime        @default(now()) @map("started_at")
+  completedAt      DateTime?       @map("completed_at")
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+
+  user    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  route   Route           @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  moments JourneyMoment[]
+
+  @@map("journeys")
+}
+
+model JourneyMoment {
+  id         Int      @id @default(autoincrement())
+  journeyId  Int      @map("journey_id")
+  spotId     String?  @map("spot_id") @db.VarChar(100)
+  spotName   String?  @map("spot_name") @db.VarChar(150)
+  type       String   @default("photo") @db.VarChar(50)
+  mediaUrl   String?  @map("media_url") @db.Text
+  caption    String?  @db.Text
+  visibility String   @default("public") @db.VarChar(50)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  journey Journey @relation(fields: [journeyId], references: [id], onDelete: Cascade)
+
+  @@map("journey_moments")
 }
