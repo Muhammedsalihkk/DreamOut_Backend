@@ -45,6 +45,7 @@ export class PrismaSpotRepository implements ISpotRepository {
             id: spot.user.id,
             name: spot.user.name,
             email: spot.user.email,
+            avatar: (spot.user as any).avatar ?? null,
           }
         : undefined,
     };
@@ -102,7 +103,7 @@ export class PrismaSpotRepository implements ISpotRepository {
       },
       include: {
         user: {
-          select: { id: true, name: true, email: true },
+          select: { id: true, name: true, email: true, avatar: true },
         },
       },
     });
@@ -113,7 +114,7 @@ export class PrismaSpotRepository implements ISpotRepository {
     const spots = await this.prisma.spot.findMany({
       include: {
         user: {
-          select: { id: true, name: true, email: true },
+          select: { id: true, name: true, email: true, avatar: true },
         },
       },
       orderBy: { createdAt: 'desc' },
@@ -126,7 +127,7 @@ export class PrismaSpotRepository implements ISpotRepository {
       where: { id },
       include: {
         user: {
-          select: { id: true, name: true, email: true },
+          select: { id: true, name: true, email: true, avatar: true },
         },
       },
     });

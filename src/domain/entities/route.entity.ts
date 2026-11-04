@@ -21,5 +21,6 @@ export interface Route {
     id: number;
     name: string | null;
     email: string;
+    avatar?: string | null;
   };
 }

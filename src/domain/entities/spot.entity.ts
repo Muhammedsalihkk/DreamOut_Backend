@@ -14,5 +14,6 @@ export interface Spot {
     id: number;
     name: string | null;
     email?: string;
+    avatar?: string | null;
   };
 }
