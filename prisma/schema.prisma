@@ -15,12 +15,20 @@ model User {
   email     String   @unique
   name      String?
   password  String
+  avatar    String?  @db.Text
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  spots    Spot[]
-  routes   Route[]
-  journeys Journey[]
+  spots         Spot[]
+  routes        Route[]
+  journeys      Journey[]
+  comments      Comment[]
+  savedItems    SavedItem[]
+  stories       Story[]
+  moments       Moment[]
+  followers     Follow[]       @relation("UserFollowers")
+  following     Follow[]       @relation("UserFollowing")
+  notifications Notification[]
 
   @@map("users")
 }
@@ -38,7 +46,9 @@ model Spot {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments   Comment[]
+  savedItems SavedItem[]
 
   @@map("spots")
 }
@@ -63,8 +73,10 @@ model Route {
   createdAt        DateTime  @default(now()) @map("created_at")
   updatedAt        DateTime  @updatedAt @map("updated_at")
 
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  journeys Journey[]
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  journeys   Journey[]
+  comments   Comment[]
+  savedItems SavedItem[]
 
   @@map("routes")
 }
@@ -104,4 +116,108 @@ model JourneyMoment {
   journey Journey @relation(fields: [journeyId], references: [id], onDelete: Cascade)
 
   @@map("journey_moments")
+}
+
+model Comment {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @map("user_id")
+  routeId    Int?     @map("route_id")
+  spotId     Int?     @map("spot_id")
+  parentId   Int?     @map("parent_id")
+  text       String   @db.Text
+  likesCount Int      @default(0) @map("likes_count")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  route Route? @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  spot  Spot?  @relation(fields: [spotId], references: [id], onDelete: Cascade)
+
+  @@map("comments")
+}
+
+model SavedItem {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  routeId   Int?     @map("route_id")
+  spotId    Int?     @map("spot_id")
+  momentId  Int?     @map("moment_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  route  Route?  @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  spot   Spot?   @relation(fields: [spotId], references: [id], onDelete: Cascade)
+  moment Moment? @relation(fields: [momentId], references: [id], onDelete: Cascade)
+
+  @@map("saved_items")
+}
+
+model Follow {
+  id          Int      @id @default(autoincrement())
+  followerId  Int      @map("follower_id")
+  followingId Int      @map("following_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  follower  User @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@map("follows")
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  actorId   Int?     @map("actor_id")
+  type      String   @db.VarChar(50)
+  category  String   @default("All") @db.VarChar(50)
+  title     String   @db.VarChar(200)
+  message   String   @db.Text
+  data      Json?    @db.JsonB
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model Story {
+  id        Int       @id @default(autoincrement())
+  userId    Int       @map("user_id")
+  routeId   Int?      @map("route_id")
+  title     String    @db.VarChar(150)
+  image     String    @db.Text
+  mediaUri  String?   @map("media_uri") @db.Text
+  type      String    @default("image") @db.VarChar(20)
+  caption   String?   @db.Text
+  expiresAt DateTime? @map("expires_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("stories")
+}
+
+model Moment {
+  id            Int         @id @default(autoincrement())
+  userId        Int         @map("user_id")
+  routeId       Int?        @map("route_id")
+  spotId        Int?        @map("spot_id")
+  type          String      @default("photo") @db.VarChar(20)
+  mediaUri      String?     @map("media_uri") @db.Text
+  noteText      String?     @map("note_text") @db.Text
+  caption       String?     @db.Text
+  visibility    String      @default("Public") @db.VarChar(20)
+  likesCount    Int         @default(0) @map("likes_count")
+  commentsCount Int         @default(0) @map("comments_count")
+  tags          Json?       @db.JsonB
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  savedItems SavedItem[]
+
+  @@map("moments")
 }

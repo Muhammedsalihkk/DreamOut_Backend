@@ -15,6 +15,7 @@ export class PrismaUserRepository implements IUserRepository {
         email: data.email,
         name: data.name,
         password: data.password || '',
+        ...(data.avatar ? { avatar: data.avatar } : {}),
       },
     });
   }

@@ -4,11 +4,13 @@ export interface CreateUserData {
   email: string;
   name?: string;
   password?: string;
+  avatar?: string;
 }
 
 export interface UpdateUserData {
   email?: string;
   name?: string;
+  avatar?: string;
 }
 
 export interface IUserRepository {

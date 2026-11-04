@@ -21,6 +21,10 @@ export function validateCreateUser(req: Request, _res: Response, next: NextFunct
     return next(new BadRequestError('Password must be a string'));
   }
 
+  if (req.body.avatar !== undefined && req.body.avatar !== null && typeof req.body.avatar !== 'string') {
+    return next(new BadRequestError('Avatar must be a string URL'));
+  }
+
   next();
 }
 
@@ -43,6 +47,10 @@ export function validateUpdateUser(req: Request, _res: Response, next: NextFunct
 
   if (password !== undefined && password !== null && typeof password !== 'string') {
     return next(new BadRequestError('Password must be a string'));
+  }
+
+  if (req.body.avatar !== undefined && req.body.avatar !== null && typeof req.body.avatar !== 'string') {
+    return next(new BadRequestError('Avatar must be a string URL'));
   }
 
   next();
